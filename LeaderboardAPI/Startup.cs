@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using LeaderboardAPI.Models;
+using LeaderboardAPI.Services;
 
 namespace LeaderboardAPI
 {
@@ -33,6 +34,8 @@ namespace LeaderboardAPI
 
             services.AddSingleton<ILeaderboardDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<LeaderboardDatabaseSettings>>().Value);
+
+            services.AddSingleton<UserService>();
 
             services.AddControllers();
         }
