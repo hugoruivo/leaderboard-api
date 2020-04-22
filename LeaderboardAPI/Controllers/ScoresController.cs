@@ -21,7 +21,11 @@ namespace LeaderboardAPI.Controllers
         [HttpGet]
         public ActionResult<ScorePage> Get(int page)
         {
-            return _scoreService.Get(page);
+            if(page < 1)
+            {
+                page = 1;
+            }
+            return _scoreService.Get(page - 1);
         }
 
         [HttpGet("{id:length(24)}", Name = "GetUserScore")]
