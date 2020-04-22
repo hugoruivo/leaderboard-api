@@ -19,34 +19,14 @@ namespace LeaderboardAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<ScorePage> Get(int page)
+        public ActionResult<ApiResponse> Get(int page, int numItems = 2)
         {
-            if(page < 1)
-            {
-                page = 1;
-            }
-            return _scoreService.Get(page - 1);
-        }
-
-        [HttpGet("{id:length(24)}", Name = "GetUserScore")]
-        public ActionResult<Score> Get(string id)
-        {
-            var score = _scoreService.Get(id);
-
-            if (score == null)
-            {
-                return NotFound();
-            }
-
-            return score;
+            return new ApiResponse(false, "", _scoreService.Get(page, numItems));
         }
 
         [HttpPost]
-        public ActionResult<Score> Create(Score score)
+        public ActionResult<ApiResponse> Create(Score score)
         {
-            //Could return other thing as result
-            //maybe a json formatted object or so, but will keep this simple
-
             //Check if empty username
             if (null != score.UserName && "" != score.UserName.Trim())
             {
@@ -55,7 +35,7 @@ namespace LeaderboardAPI.Controllers
                 if (null != existingUser && null != existingUser.Id)
                 {
                     //It Exists, we can try to insert the score
-                    if(0 <= score.UserScore)
+                    if(0 < score.UserScore)
                     {
                         //User exists and has a score: need to check if already in the DB to update or not
                         Score existingScore = _scoreService.GetByUsername(score.UserName);
@@ -65,22 +45,22 @@ namespace LeaderboardAPI.Controllers
                             //will only update if new score is higher than existing one
                             if(existingScore.UserScore >= score.UserScore)
                             {
-                                return BadRequest("Score is lower or equal than existing high score");
+                                return BadRequest(new ApiResponse(true, "Score is lower or equal than existing high score"));
                             }
                             //New score is higher than existing one, update it
                             existingScore.UserScore = score.UserScore;
                             _scoreService.Update(existingScore.Id, existingScore);
-                            return CreatedAtRoute("GetUserScore", new { id = existingScore.Id.ToString() }, existingScore);
+                            return StatusCode(201, new ApiResponse(false, "", existingScore));
                         }
                         //User has no existing score, will create it
                         _scoreService.Create(score);
-                        return CreatedAtRoute("GetUserScore", new { id = score.Id.ToString() }, score);
+                        return StatusCode(201, new ApiResponse(false, "", score));
                     }
-                    return BadRequest("Score is required");
+                    return BadRequest(new ApiResponse(true, "Score is required"));
                 }
-                return BadRequest("Username is not registered");
+                return BadRequest(new ApiResponse(true, "Username is not registered"));
             }
-            return BadRequest("Username is required");
+            return BadRequest(new ApiResponse(true, "Username is required"));
         }
     }
 }

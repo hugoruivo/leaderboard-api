@@ -42,11 +42,22 @@ namespace LeaderboardAPI.Services
         public Score Get(string id) =>
             _scores.Find<Score>(score => score.Id == id).FirstOrDefault();
 
-        public ScorePage Get(int page)
+        public ScorePage Get(int page, int numItems)
         {
+            if (page < 1)
+            {
+                page = 1;
+            }
+            if (numItems < 1)
+            {
+                numItems = ITEMS_PER_PAGE;
+            }
+            //Page starts at 1 but we retrieve from a zero based, so subtract
+            page -= 1;
+
             var scoresQuery = _scores.Find(score => true).SortByDescending(score => score.UserScore);
             long totalScores = scoresQuery.CountDocuments();
-            List<Score> items = scoresQuery.Skip(page * ITEMS_PER_PAGE).Limit(ITEMS_PER_PAGE).ToList();
+            List<Score> items = scoresQuery.Skip(page * numItems).Limit(numItems).ToList();
             return new ScorePage(totalScores, items);
         }
 

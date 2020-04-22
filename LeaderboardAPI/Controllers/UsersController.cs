@@ -18,27 +18,11 @@ namespace LeaderboardAPI.Controllers
 
         [HttpGet]
         public ActionResult<List<User>> Get() =>
-            _userService.Get();
-
-        [HttpGet("{id:length(24)}", Name = "GetUser")]
-        public ActionResult<User> Get(string id)
-        {
-            var user = _userService.Get(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
-        }
+            Unauthorized();
 
         [HttpPost]
         public ActionResult<User> Create(User user)
         {
-            //For the badrequest: Could return other thing as result
-            //maybe a json formatted object or so, but will keep this simple
-
             //Check if empty username
             if (null != user.UserName && "" != user.UserName.Trim())
             {
@@ -48,13 +32,13 @@ namespace LeaderboardAPI.Controllers
                 if (null != existingUser && null != existingUser.Id)
                 {
                     //Exists
-                    return BadRequest("Username already exists");
+                    return BadRequest(new ApiResponse(true, "Username already exists"));
                 }
                 _userService.Create(user);
 
-                return CreatedAtRoute("GetUser", new { id = user.Id.ToString() }, user);
+                return StatusCode(201, new ApiResponse(false, "", user));
             }
-            return BadRequest("Username is required");
+            return BadRequest(new ApiResponse(true, "Username is required"));
         }
     }
 }
