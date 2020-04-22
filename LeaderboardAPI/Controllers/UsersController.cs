@@ -38,6 +38,13 @@ namespace LeaderboardAPI.Controllers
         {
             if (null != user.UserName && "" != user.UserName.Trim())
             {
+                User existingUser = _userService.GetByUsername(user.UserName);
+
+                if(null != existingUser && null != existingUser.Id)
+                {
+                    //Exists
+                    return BadRequest("Username already exists");
+                }
                 _userService.Create(user);
 
                 return CreatedAtRoute("GetUser", new { id = user.Id.ToString() }, user);

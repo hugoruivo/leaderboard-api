@@ -15,6 +15,18 @@ namespace LeaderboardAPI.Services
             var database = client.GetDatabase(settings.DatabaseName);
 
             _users = database.GetCollection<User>(settings.UsersCollectionName);
+
+
+
+
+            var options = new CreateIndexOptions() { Unique = true, Name = "Unique Username" };
+            var field = new StringFieldDefinition<User>("UserName");
+            var indexDefinition = new IndexKeysDefinitionBuilder<User>().Ascending(field);
+
+            var indexModel = new CreateIndexModel<User>(indexDefinition, options);
+            _users.Indexes.CreateOne(indexModel);
+
+
         }
 
         public List<User> Get() =>
@@ -22,6 +34,9 @@ namespace LeaderboardAPI.Services
 
         public User Get(string id) =>
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
+
+        public User GetByUsername(string username) =>
+            _users.Find<User>(user => user.UserName == username).FirstOrDefault();
 
         public User Create(User user)
         {
