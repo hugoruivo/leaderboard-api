@@ -10,4 +10,7 @@
   </ItemGroup>
 
 
+  <ItemGroup>
+    <Compile Remove="Models\ApiResponse.cs" />
+  </ItemGroup>
 </Project>
