@@ -37,6 +37,8 @@ namespace LeaderboardAPI
 
             services.AddSingleton<UserService>();
 
+            services.AddSingleton<ScoreService>();
+
             services.AddControllers();
         }
 

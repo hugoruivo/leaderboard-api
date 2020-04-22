@@ -36,11 +36,16 @@ namespace LeaderboardAPI.Controllers
         [HttpPost]
         public ActionResult<User> Create(User user)
         {
+            //For the badrequest: Could return other thing as result
+            //maybe a json formatted object or so, but will keep this simple
+
+            //Check if empty username
             if (null != user.UserName && "" != user.UserName.Trim())
             {
                 User existingUser = _userService.GetByUsername(user.UserName);
 
-                if(null != existingUser && null != existingUser.Id)
+                //Check if username is registered / exists
+                if (null != existingUser && null != existingUser.Id)
                 {
                     //Exists
                     return BadRequest("Username already exists");
