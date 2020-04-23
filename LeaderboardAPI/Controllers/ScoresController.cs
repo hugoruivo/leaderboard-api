@@ -19,13 +19,13 @@ namespace LeaderboardAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<ApiResponse> Get(int page, int numItems = 2)
+        public ActionResult<CustomApiResponse> Get(int page, int numItems = 2)
         {
-            return new ApiResponse(false, "", _scoreService.Get(page, numItems));
+            return new CustomApiResponse(false, "", _scoreService.Get(page, numItems));
         }
 
         [HttpPost]
-        public ActionResult<ApiResponse> Create(Score score)
+        public ActionResult<CustomApiResponse> Create(Score score)
         {
             //Check if empty username
             if (null != score.UserName && "" != score.UserName.Trim())
@@ -45,22 +45,22 @@ namespace LeaderboardAPI.Controllers
                             //will only update if new score is higher than existing one
                             if(existingScore.UserScore >= score.UserScore)
                             {
-                                return BadRequest(new ApiResponse(true, "Score is lower or equal than existing high score"));
+                                return BadRequest(new CustomApiResponse(true, "Score is lower or equal than existing high score"));
                             }
                             //New score is higher than existing one, update it
                             existingScore.UserScore = score.UserScore;
                             _scoreService.Update(existingScore.Id, existingScore);
-                            return StatusCode(201, new ApiResponse(false, "", existingScore));
+                            return StatusCode(201, new CustomApiResponse(false, "", existingScore));
                         }
                         //User has no existing score, will create it
                         _scoreService.Create(score);
-                        return StatusCode(201, new ApiResponse(false, "", score));
+                        return StatusCode(201, new CustomApiResponse(false, "", score));
                     }
-                    return BadRequest(new ApiResponse(true, "Score is required"));
+                    return BadRequest(new CustomApiResponse(true, "Score is required"));
                 }
-                return BadRequest(new ApiResponse(true, "Username is not registered"));
+                return BadRequest(new CustomApiResponse(true, "Username is not registered"));
             }
-            return BadRequest(new ApiResponse(true, "Username is required"));
+            return BadRequest(new CustomApiResponse(true, "Username is required"));
         }
     }
 }
